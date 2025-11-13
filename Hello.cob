@@ -3,8 +3,9 @@
            
            DATA DIVISION.
            WORKING-STORAGE SECTION.
+           01 VAR-TEXT PIC X(20) VALUE "Hello med variabel".
            
            PROCEDURE DIVISION.
            
-           DISPLAY "Hello, World!".
+           DISPLAY VAR-TEXT
            STOP RUN.
