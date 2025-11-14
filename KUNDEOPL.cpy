@@ -13,6 +13,6 @@
                    03 BY-X             PIC X(20).
                    03 POSTNR           PIC X(4).
                    03 LANDE-KODE       PIC X(2).
-               02  .
+               02 INFO.
                    03 TELEFON          PIC X(8).
                    03 EMAIL            PIC X(50).
