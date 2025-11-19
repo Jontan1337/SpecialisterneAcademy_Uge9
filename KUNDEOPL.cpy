@@ -3,7 +3,7 @@
                02 FORNAVN              PIC X(20) VALUE SPACES.
                02 EFTERNAVN            PIC X(20) VALUE SPACES.
                02 KONTONUMMER          PIC X(20) VALUE SPACES.
-               02 BALANCE              PIC 9(7)V99 VALUE 0.
+               02 BALANCE              PIC 9(7)V99 VALUE ZEROES.
                02 VALUTAKODE           PIC X(3) VALUE SPACES.
                02 ADDRESSE.
                    03 VEJNAVN          PIC X(30).

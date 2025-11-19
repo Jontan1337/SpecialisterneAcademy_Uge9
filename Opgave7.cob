@@ -1,0 +1,140 @@
+           IDENTIFICATION DIVISION.
+           PROGRAM-ID. OPGAVE7.
+           
+           ENVIRONMENT DIVISION.
+           INPUT-OUTPUT SECTION.
+           FILE-CONTROL.
+           SELECT KUNDEOPLFILEIN ASSIGN TO "Kundeoplysninger.txt"
+               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT KUNDEOPLFILEOUT ASSIGN TO "KundeoplysningerOut.txt"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+           DATA DIVISION.
+           FILE SECTION.
+           FD KUNDEOPLFILEIN.
+           01 KUNDEOPLINDEF.
+               COPY "KUNDEOPL.cpy".
+
+           FD KUNDEOPLFILEOUT.
+           01 KUNDEOPLOUTDEF.
+               COPY "KUNDEOPL.cpy".
+
+           WORKING-STORAGE SECTION.
+           01 KUNDEOPLDATA.
+               COPY "KUNDEOPL.cpy".
+           
+           01 KUNDEOPL-FILE-PROCESS.
+               02 NAVN-ADR             PIC X(100) VALUE SPACES.
+           
+           01 END-OF-FILE              PIC 9(4) VALUE 0.
+
+      *    CLEANTEXT PARAMETERS
+           01 CT-IN                        PIC X(100) VALUE SPACES.
+           01 CT-OUT                       PIC X(100) VALUE SPACES.
+           01 CT-IX                        PIC 9(3) VALUE ZEROES.
+           01 CT-IX2                       PIC 9(3) VALUE ZEROES.
+           01 CT-CURRENTCHAR               PIC X(1) VALUE SPACES.
+           01 CT-PREVIOUSCHAR              PIC X(1) VALUE SPACES.
+      *    CLEANTEXT PARAMETERS END
+
+           PROCEDURE DIVISION.
+           MOVE 1234567890 TO KUNDE-ID IN KUNDEOPLDATA.
+           MOVE "Lars" TO FORNAVN IN KUNDEOPLDATA.
+           MOVE "Hansen" TO EFTERNAVN IN KUNDEOPLDATA.
+           MOVE "DK12345678912345" TO KONTONUMMER IN KUNDEOPLDATA.
+           MOVE 2500.75 TO BALANCE IN KUNDEOPLDATA.
+           MOVE "DKK" TO VALUTAKODE IN KUNDEOPLDATA.
+           MOVE "Vej1" TO VEJNAVN IN KUNDEOPLDATA.
+           MOVE "42" TO HUSNR IN KUNDEOPLDATA.
+           MOVE "2" TO ETAGE IN KUNDEOPLDATA.
+           MOVE "Side?" TO SIDE IN KUNDEOPLDATA.
+           MOVE "Greve" TO BY-X IN KUNDEOPLDATA.
+           MOVE "2670" TO POSTNR IN KUNDEOPLDATA.
+           MOVE "DK" TO LANDE-KODE IN KUNDEOPLDATA.
+
+      *    DISPLAY KUNDEOPLDATA.
+           
+           PERFORM READ-KUNDEOPL-FILE.
+
+           STOP RUN.
+
+           READ-KUNDEOPL-FILE.
+           OPEN INPUT KUNDEOPLFILEIN.
+           OPEN OUTPUT KUNDEOPLFILEOUT.
+
+           PERFORM UNTIL END-OF-FILE = 1
+               READ KUNDEOPLFILEIN INTO KUNDEOPLINDEF
+                   AT END
+                       MOVE 1 TO END-OF-FILE
+                   NOT AT END
+                       MOVE KUNDE-ID IN KUNDEOPLINDEF TO KUNDEOPLOUTDEF
+                       WRITE KUNDEOPLOUTDEF
+                       MOVE SPACES TO KUNDEOPLOUTDEF
+
+                       PERFORM FORMAT-NAVN
+
+                       PERFORM FORMAT-ADDRESSE
+
+                       PERFORM FORMAT-BY
+
+      *                Kunde separerings linje
+                       WRITE KUNDEOPLOUTDEF
+               END-READ
+           END-PERFORM
+
+           CLOSE KUNDEOPLFILEIN.
+           CLOSE KUNDEOPLFILEOUT.
+
+           CLEANTEXT.
+           MOVE ZEROES TO CT-IX.
+           MOVE ZEROES TO CT-IX2.
+           PERFORM UNTIL CT-IX = LENGTH OF CT-IN
+           MOVE CT-IN(CT-IX:1) TO CT-CURRENTCHAR
+           ADD 1 TO CT-IX
+           IF NOT CT-CURRENTCHAR = SPACE OR NOT CT-PREVIOUSCHAR = SPACE
+               MOVE CT-CURRENTCHAR TO CT-OUT(CT-IX2:1)
+               MOVE CT-CURRENTCHAR TO CT-PREVIOUSCHAR
+               ADD 1 TO CT-IX2
+           END-IF
+           END-PERFORM
+           MOVE SPACES TO CT-IN.
+
+           FORMAT-NAVN.
+           STRING
+           FORNAVN IN KUNDEOPLINDEF DELIMITED BY SIZE
+           " "
+           EFTERNAVN IN KUNDEOPLINDEF DELIMITED BY SIZE
+           INTO CT-IN.
+           PERFORM CLEANTEXT.
+           MOVE CT-OUT TO KUNDEOPLOUTDEF.
+           WRITE KUNDEOPLOUTDEF.
+           MOVE SPACES TO CT-OUT.
+           MOVE SPACES TO KUNDEOPLOUTDEF.
+
+           FORMAT-ADDRESSE.
+           STRING
+           VEJNAVN IN KUNDEOPLINDEF DELIMITED BY SIZE
+           " "
+           HUSNR IN KUNDEOPLINDEF DELIMITED BY SIZE
+           " "
+           ETAGE IN KUNDEOPLINDEF DELIMITED BY SIZE
+           " "
+           SIDE IN KUNDEOPLINDEF DELIMITED BY SIZE
+           INTO CT-IN.
+           PERFORM CLEANTEXT.
+           MOVE CT-OUT TO KUNDEOPLOUTDEF.
+           WRITE KUNDEOPLOUTDEF.
+           MOVE SPACES TO CT-OUT.
+           MOVE SPACES TO KUNDEOPLOUTDEF.
+
+           FORMAT-BY.
+           STRING
+           POSTNR IN KUNDEOPLINDEF DELIMITED BY SIZE
+           " "
+           BY-X IN KUNDEOPLINDEF DELIMITED BY SIZE
+           INTO CT-IN.
+           PERFORM CLEANTEXT.
+           MOVE CT-OUT TO KUNDEOPLOUTDEF.
+           WRITE KUNDEOPLOUTDEF.
+           MOVE SPACES TO CT-OUT.
+           MOVE SPACES TO KUNDEOPLOUTDEF.
