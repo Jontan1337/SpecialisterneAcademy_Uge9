@@ -53,8 +53,6 @@
 
       *    PARAGRAPH FINDKUNDEKONTO
            01 FKK-PARAM-KUNDE-ID           PIC X(10) VALUE SPACES.
-           01 FKK-RETURN-MATCH.
-               COPY "KONTOOPL.cpy".
       *    PARAGRAPH FINDKUNDEKONTO END
 
       *    CLEANTEXT PARAMETERS
@@ -93,15 +91,11 @@
 
                        PERFORM FORMAT-BY
 
-      *                Find matching KUNDE-ID and return match.
-                       PERFORM PREPARE-FINDKUNDEKONTO
+      *                Find all konti matching KUNDE-ID and write them.
+                       PERFORM PREPARE-WRITEALLKUNDEKONTI
                        MOVE KUNDE-ID IN KUNDEOPLINDEF
                        TO FKK-PARAM-KUNDE-ID
-                       PERFORM FINDKUNDEKONTO
-                       DISPLAY "MATCH: " FKK-RETURN-MATCH
-                       MOVE FKK-RETURN-MATCH TO KUNDEKONTOOUT
-                       WRITE KUNDEKONTOOUT
-                       MOVE SPACES TO KUNDEKONTOOUT
+                       PERFORM WRITEALLKUNDEKONTI
 
       *                KUNDE separating line.
                        WRITE KUNDEKONTOOUT
@@ -111,7 +105,7 @@
            CLOSE KUNDEOPLFILEIN.
            CLOSE KUNDEKONTOFILEOUT.
 
-           FINDKUNDEKONTO.
+           WRITEALLKUNDEKONTI.
            OPEN INPUT KONTOOPLFILEIN.
 
            PERFORM UNTIL END-OF-FILE-FKK = 1
@@ -120,16 +114,17 @@
                        MOVE 1 TO END-OF-FILE-FKK
                    NOT AT END
                        IF KUNDE-ID IN KUNDEKONTOIN = FKK-PARAM-KUNDE-ID
-                           MOVE KUNDEKONTOIN TO FKK-RETURN-MATCH
+                           MOVE KUNDEKONTOIN TO KUNDEKONTOOUT
+                           WRITE KUNDEKONTOOUT
+                           MOVE SPACES TO KUNDEKONTOOUT
                        END-IF
                END-READ
            END-PERFORM
            
            CLOSE KONTOOPLFILEIN.
 
-           PREPARE-FINDKUNDEKONTO.
+           PREPARE-WRITEALLKUNDEKONTI.
            MOVE SPACES TO FKK-PARAM-KUNDE-ID.
-           MOVE SPACES TO FKK-RETURN-MATCH.
            MOVE 0 TO END-OF-FILE-FKK.
 
            TRIMSPACES.
